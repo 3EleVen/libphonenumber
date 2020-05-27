@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
+#include <map>
 
 std::string OUT_GEOCODE_ZH = "../resources/geocoding/zh/86.txt";
 
@@ -26,6 +27,8 @@ int main()
 		std::ofstream carrier_zh(OUT_CARRIER_ZH, std::ios::out);
 		std::ofstream carrier_zh_hant(OUT_CARRIER_ZH_HANT, std::ios::out);
 
+		std::map<std::string, std::string> areaName; 
+
 		std::sort(infoVec.begin(), infoVec.end(), cmp);
 
 		for (int i = 0; i < infoVec.size(); i++) {
@@ -36,19 +39,30 @@ int main()
 			} else {
 				geoCode_zh << "86" << info.phone << "|";
 			}
-			// 直辖市
-			if (info.province == info.city) {
-				geoCode_zh << info.city << "市" << std::endl;
-			} else {
-				// 少数民族自治区
-				if (info.province == "内蒙古" || info.province == "西藏" || 
-					info.province == "广西" || info.province == "宁夏" || info.province == "新疆") {
-					geoCode_zh << info.province << ", " << info.city << "市" << std::endl;
+			if (areaName.count(info.areaCode) == 0) {
+				std::string res;
+				// 直辖市
+				if (info.province == info.city) {
+					res = info.city + "市";
 				} else {
-					geoCode_zh << info.province << "省" << info.city << "市" << std::endl;
+					// 少数民族自治区
+					if (info.province == "内蒙古" || info.province == "西藏" || 
+						info.province == "广西" || info.province == "宁夏" || info.province == "新疆") {
+						res = info.province + info.city + "市";
+					} else {
+						res = info.province + "省" + info.city + "市";
+					}
 				}
+				areaName[info.areaCode] = res;
+				geoCode_zh << res << std::endl;
+			} else {
+				geoCode_zh << areaName[info.areaCode] << std::endl;
 			}
 		}
+		for (auto iter = areaName.begin(); iter != areaName.end(); iter++) {
+			geoCode_zh << "86" << std::stoi(iter->first) << "|" << iter->second << std::endl;
+		}
+
 		for (int i = 0; i < infoVec.size(); i++) {
 			PhoneInfo info = infoVec[i];
 			int comPos = 9;
