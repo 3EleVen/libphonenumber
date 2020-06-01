@@ -43,15 +43,9 @@ int main()
 				std::string res;
 				// 直辖市
 				if (info.province == info.city) {
-					res = info.city + "市";
+					res = info.city;
 				} else {
-					// 少数民族自治区
-					if (info.province == "内蒙古" || info.province == "西藏" || 
-						info.province == "广西" || info.province == "宁夏" || info.province == "新疆") {
-						res = info.province + info.city + "市";
-					} else {
-						res = info.province + "省" + info.city + "市";
-					}
+					res = info.province + " " + info.city;
 				}
 				areaName[info.areaCode] = res;
 				geoCode_zh << res << std::endl;
